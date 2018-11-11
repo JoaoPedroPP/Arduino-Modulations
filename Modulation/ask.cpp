@@ -1,39 +1,30 @@
-#include "fsk.hpp"
+#include "ask.hpp"
 
-#define TX_PIN      (3) // Pino de trasmissao dos dados
+#define TX_PIN      (5) // Pino de trasmissao dos dados
 
 #define TIMER_CLOCK_SELECT       (4) //timer 4 (controls pin 8, 7, 6)
 #define MICROS_PER_TIMER_COUNT   (clockCyclesToMicroseconds(64)) // Numero de microsegundos para o Timer 4 dar overflow
 
 #define BIT_PERIOD             (1000000/BAUD_RATE) //E 1.000.000 porque esta em microsegundos. 976us
-#define HIGH_FREQ_MICROS       (1000000/HIGH_FREQUENCY) // Tamanho do pulso (PWM) na frequencia alta. 100us
-#define LOW_FREQ_MICROS        (1000000/LOW_FREQUENCY) // Tamanho do pulso (PWM) na frequencia baixa. 200us
+#define FREQ_MICROS            (1000000/FREQUENCY) // Tamanho do pulso (PWM) na frequencia alta. 100us
 
-#define HIGH_FREQ_CNT          (BIT_PERIOD/HIGH_FREQ_MICROS) // 9,76
-#define LOW_FREQ_CNT           (BIT_PERIOD/LOW_FREQ_MICROS) // 4,88
+#define FREQ_CNT          (BIT_PERIOD/FREQ_MICROS) // 9,76
 
 #define MAX_CARRIR_BITS        (40000/BIT_PERIOD) // 40ms
 
 #define TCNT_BIT_PERIOD        (BIT_PERIOD/MICROS_PER_TIMER_COUNT) // 15,25
-#define TCNT_HIGH_FREQ         (HIGH_FREQ_MICROS/MICROS_PER_TIMER_COUNT) // 1,5625
-#define TCNT_LOW_FREQ          (LOW_FREQ_MICROS/MICROS_PER_TIMER_COUNT) // 4,88
+#define TCNT_FREQ              (FREQ_MICROS/MICROS_PER_TIMER_COUNT) // 1,5625
 
-#define TCNT_HIGH_TH_L         (TCNT_HIGH_FREQ * 0.80)
-#define TCNT_HIGH_TH_H         (TCNT_HIGH_FREQ * 1.15)
-#define TCNT_LOW_TH_L          (TCNT_LOW_FREQ * 0.85)
-#define TCNT_LOW_TH_H          (TCNT_LOW_FREQ * 1.20)
+#define TCNT_TH_L         (TCNT_FREQ * 0.80)
+#define TCNT_TH_H         (TCNT_FREQ * 1.15)
 
-FSKModulation::FSKModulation(){
+ASKModulation::ASKModulation(){
 }
 
-FSKModulation::~FSKModulation(){
+ASKModulation::~ASKModulation(){
 }
 
-char FSKModulation::helloworld(){
-    return 'a';
-}
-
-void FSKModulation::begin(){
+void ASKModulation::begin(){
     pinMode(TX_PIN, OUTPUT);
     digitalWrite(TX_PIN, LOW);
 
@@ -46,22 +37,21 @@ void FSKModulation::begin(){
 	DIDR1  = _BV(AIN1D) | _BV(AIN0D); // digital port off
 }
 
-void FSKModulation::modulate(uint8_t data){
+void ASKModulation::modulate(uint8_t data){
     uint8_t cnt;
     uint8_t tcnt;
     uint8_t tcnt2;
 
-    if (data) {
-        cnt = (uint8_t)(HIGH_FREQ_CNT);
-        tcnt2 = (uint8_t)(TCNT_HIGH_FREQ / 2);
-        tcnt = (uint8_t)(TCNT_HIGH_FREQ) - tcnt2;
+    if (data){
+        cnt = (uint8_t)(FREQ_CNT);
+        tcnt2 = (uint8_t)(TCNT_FREQ / 2);
+        tcnt = (uint8_t)(TCNT_FREQ) - tcnt2;
     }
     else {
-        cnt = (uint8_t)(LOW_FREQ_CNT);
-        tcnt2 = (uint8_t)(TCNT_LOW_FREQ / 2);
-        tcnt = (uint8_t)(TCNT_LOW_FREQ) - tcnt2;
+        cnt = (uint8_t)(FREQ_CNT);
+        tcnt2 = (uint8_t)0;
+        tcnt = (uint8_t)0;
     }
-
     do {
         cnt--;
         {
@@ -79,7 +69,7 @@ void FSKModulation::modulate(uint8_t data){
     } while(cnt);
 }
 
-size_t FSKModulation::transmite(const uint8_t *buffer, size_t length){
+size_t ASKModulation::transmite(const uint8_t *buffer, size_t length){
     uint8_t cnt = ((micros()- _TempoUltimaTransmissao)/BIT_PERIOD);
     if (cnt > MAX_CARRIR_BITS){
         cnt = MAX_CARRIR_BITS;
