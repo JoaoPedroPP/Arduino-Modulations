@@ -1,5 +1,7 @@
 #include "fsk.hpp"
 
+#define TX_PIN      (3) // Pino de trasmissao dos dados
+
 #define TIMER_CLOCK_SELECT       (4) //timer 4 (controls pin 8, 7, 6)
 #define MICROS_PER_TIMER_COUNT   (clockCyclesToMicroseconds(64)) // Numero de microsegundos para o Timer 4 dar overflow
 
@@ -31,12 +33,25 @@ char FSKModulation::helloworld(){
     return 'a';
 }
 
-void FSKModulation::modulate(string data){
+void FSKModulation::begin(){
+    pinMode(TX_PIN, OUTPUT);
+    digitalWrite(TX_PIN, LOW);
+
+    _txPortReg = portOutputRegister(digitalPinToPort(TX_PIN));
+	_txPortMask = digitalPinToBitMask(TX_PIN);
+
+    TCCR2A = 0;
+	TCCR2B = TIMER_CLOCK_SELECT;
+	ACSR   = _BV(ACIE) | _BV(ACIS1);
+	DIDR1  = _BV(AIN1D) | _BV(AIN0D); // digital port off
+}
+
+void FSKModulation::modulate(uint8_t data){
     uint8_t cnt;
         uint8_t tcnt;
         uint8_t tcnt2;
 
-        if (dado) {
+        if (data) {
             cnt = (uint8_t)(HIGH_FREQ_CNT);
             tcnt2 = (uint8_t)(TCNT_HIGH_FREQ / 2);
             tcnt = (uint8_t)(TCNT_HIGH_FREQ) - tcnt2;
@@ -64,4 +79,24 @@ void FSKModulation::modulate(string data){
         } while(cnt);
 }
 
-void FSKModulation::write(){}
+size_t FSKModulation::transmite(const uint8_t *buffer, size_t length){
+    uint8_t cnt = ((micros()- _TempoUltimaTransmissao)/BIT_PERIOD);
+    if (cnt > MAX_CARRIR_BITS){
+        cnt = MAX_CARRIR_BITS;
+    }
+
+    size_t n = length;
+    while(length--){ // Aqui e onde a magia acontece
+    uint8_t data = *buffer++;
+        for(uint8_t mask = 1; mask; mask <<= 1){
+            if (data & mask){
+                modulate(HIGH);
+            }
+            else {
+                modulate(LOW);
+            }
+        }
+        _TempoUltimaTransmissao = micros();
+        return n;
+    }
+}
