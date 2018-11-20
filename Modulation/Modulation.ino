@@ -13,7 +13,7 @@ void setup() {
 }
 
 void loop() {
-  ask.transmite(128,1);
+  ask.transmite('U');
 //    fsk.transmite('U',1);
 //  fsk.transmite("joao pedro poloni ponce escreveu esse software", 46);
 }

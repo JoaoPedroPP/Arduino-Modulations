@@ -78,6 +78,7 @@ size_t ASKModulation::transmite(const uint8_t *buffer, size_t length){
     size_t n = length;
     while(length--){ // Aqui e onde a magia acontece
         uint8_t data = *buffer++;
+        // uint8_t data = 0x253;
         for(uint8_t mask = 1; mask; mask <<= 1){
             if (data & mask){
                 modulate(HIGH);
@@ -91,4 +92,8 @@ size_t ASKModulation::transmite(const uint8_t *buffer, size_t length){
     }
     _TempoUltimaTransmissao = micros();
     return n;
+}
+
+size_t ASKModulation::transmite(uint8_t data){
+    return transmite(&data, sizeof(data));
 }

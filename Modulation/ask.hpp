@@ -18,6 +18,7 @@ class ASKModulation {
         ~ASKModulation();
         void begin();
         virtual size_t transmite(const uint8_t *buffer, size_t size);
+        virtual size_t transmite(uint8_t data);
 };
 
 #endif
