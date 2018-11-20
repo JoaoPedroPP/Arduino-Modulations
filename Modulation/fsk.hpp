@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define BAUD_RATE   (1024) // Taxa de trasmissao de simbolos
-#define HIGH_FREQUENCY (10000)
+#define HIGH_FREQUENCY (2000)
 #define LOW_FREQUENCY (1000)
 
 class FSKModulation {

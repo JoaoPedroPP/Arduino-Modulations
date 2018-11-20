@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 
-#define BAUD_RATE   (1024) // Taxa de trasmissao de simbolos
-#define FREQUENCY (500)
+#define BAUD_RATE_ASK   (1225) // Taxa de trasmissao de simbolos
+#define FREQUENCY_ASK (4900)
 
 class ASKModulation {
     private:
