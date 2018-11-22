@@ -1,6 +1,7 @@
 #include "psk.hpp"
 
-#define TX_PIN_PSK      (5) // Pino de trasmissao dos dados
+#define TX_PIN_PSK      (6) // Pino de trasmissao dos dados
+#define PHASE_PIN       (4)
 
 #define TIMER_CLOCK_SELECT       (4) //timer 4 (controls pin 8, 7, 6)
 #define MICROS_PER_TIMER_COUNT_PSK   (clockCyclesToMicroseconds(64)) // Numero de microsegundos para o Timer 4 dar overflow
@@ -21,7 +22,9 @@ PSKModulation::~PSKModulation(){
 
 void PSKModulation::begin(){
     pinMode(TX_PIN_PSK, OUTPUT);
+    pinMode(PHASE_PIN, OUTPUT);
     digitalWrite(TX_PIN_PSK, LOW);
+    digitalWrite(PHASE_PIN, LOW);
 
     _txPortReg = portOutputRegister(digitalPinToPort(TX_PIN_PSK));
 	_txPortMask = digitalPinToBitMask(TX_PIN_PSK);
@@ -48,13 +51,13 @@ void PSKModulation::modulate(uint8_t data){
             TIFR2 |= _BV(OCF2B); //Timer Interrupt Flag, atualiza TIFR2 com a operacao ou com o OCF2B andadando um bit para a esquerda
             while(!(TIFR2 & _BV(OCF2B))); //transmite parte alta
         }
-        if (data) *_txPortReg ^= _txPortMask;
+        *_txPortReg ^= _txPortMask;
         {
             OCR2B += tcnt2;
             TIFR2 |= _BV(OCF2B);
             while(!(TIFR2 & _BV(OCF2B))); //transmite parte baixa
         }
-        if (data) *_txPortReg ^= _txPortMask;
+        *_txPortReg ^= _txPortMask;
     } while(cnt);
 }
 
@@ -65,13 +68,16 @@ size_t PSKModulation::transmite(const uint8_t *buffer, size_t length){
         uint8_t data = *buffer++;
         for(uint8_t mask = 1; mask; mask <<= 1){
             if (data & mask){
+                digitalWrite(PHASE_PIN, LOW);
                 modulate(HIGH);
             }
             else {
+                digitalWrite(PHASE_PIN, HIGH);
                 modulate(LOW);
             }
         }
     }
+    digitalWrite(PHASE_PIN, LOW);
     _TempoUltimaTransmissao = micros();
     return n;
 }
