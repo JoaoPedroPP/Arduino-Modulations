@@ -9,7 +9,9 @@
 class PSKModulation {
     private:
         volatile uint8_t *_txPortReg;
+        volatile uint8_t *_phPortReg;
 	    uint8_t _txPortMask;
+        uint8_t _phPortMask;
         unsigned long _TempoUltimaTransmissao;
         void modulate(uint8_t data);
 

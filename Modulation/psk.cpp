@@ -23,11 +23,14 @@ PSKModulation::~PSKModulation(){
 void PSKModulation::begin(){
     pinMode(TX_PIN_PSK, OUTPUT);
     pinMode(PHASE_PIN, OUTPUT);
+    
     digitalWrite(TX_PIN_PSK, LOW);
     digitalWrite(PHASE_PIN, LOW);
 
     _txPortReg = portOutputRegister(digitalPinToPort(TX_PIN_PSK));
 	_txPortMask = digitalPinToBitMask(TX_PIN_PSK);
+    _phPortReg = portOutputRegister(digitalPinToPort(PHASE_PIN));
+	_phPortMask = digitalPinToBitMask(PHASE_PIN);
 
     TCCR2A = 0;
 	TCCR2B = TIMER_CLOCK_SELECT;
@@ -43,6 +46,9 @@ void PSKModulation::modulate(uint8_t data){
     cnt = (uint8_t)(FREQ_CNT_PSK);
     tcnt2 = (uint8_t)(TCNT_FREQ_PSK / 2);
     tcnt = (uint8_t)(TCNT_FREQ_PSK) - tcnt2;
+
+    // if (data) digitalWrite(PHASE_PIN, LOW);
+    // else digitalWrite(PHASE_PIN, HIGH);
     
     do {
         cnt--;
@@ -66,18 +72,21 @@ size_t PSKModulation::transmite(const uint8_t *buffer, size_t length){
     size_t n = length;
     while(length--){ // Aqui e onde a magia acontece
         uint8_t data = *buffer++;
+        // uint8_t data = 0x01;
         for(uint8_t mask = 1; mask; mask <<= 1){
             if (data & mask){
                 digitalWrite(PHASE_PIN, LOW);
+                // delay(500);
                 modulate(HIGH);
             }
             else {
                 digitalWrite(PHASE_PIN, HIGH);
+                // delay(500);
                 modulate(LOW);
             }
         }
     }
-    digitalWrite(PHASE_PIN, LOW);
+    // digitalWrite(PHASE_PIN, LOW);
     _TempoUltimaTransmissao = micros();
     return n;
 }
