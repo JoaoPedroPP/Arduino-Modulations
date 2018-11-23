@@ -100,3 +100,7 @@ size_t FSKModulation::transmite(const uint8_t *buffer, size_t length){
         return n;
     }
 }
+
+size_t FSKModulation::transmite(uint8_t data){
+    return transmite(&data, sizeof(data));
+}

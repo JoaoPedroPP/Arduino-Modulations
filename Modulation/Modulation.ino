@@ -10,14 +10,14 @@ int led = 13;
 int ledPin = 9;
 
 void setup() {
-  // ask.begin();
+//   ask.begin();
 //  fsk.begin();
     psk.begin();
 }
 
 void loop() {
   psk.transmite('U');
-  // ask.transmite('U');
-//    fsk.transmite('U',1);
+//   ask.transmite('U');
+//    fsk.transmite('U');
 //  fsk.transmite("joao pedro poloni ponce escreveu esse software", 46);
 }

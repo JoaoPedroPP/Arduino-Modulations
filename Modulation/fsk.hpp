@@ -19,7 +19,7 @@ class FSKModulation {
         ~FSKModulation();
         char helloworld();
         void begin();
-	    // virtual size_t transmite(uint8_t data);
+	    virtual size_t transmite(uint8_t data);
         virtual size_t transmite(const uint8_t *buffer, size_t size);
 };
 

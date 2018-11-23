@@ -72,7 +72,7 @@ size_t PSKModulation::transmite(const uint8_t *buffer, size_t length){
     size_t n = length;
     while(length--){ // Aqui e onde a magia acontece
         uint8_t data = *buffer++;
-        // uint8_t data = 0x01;
+        // uint8_t data = 0x55;
         for(uint8_t mask = 1; mask; mask <<= 1){
             if (data & mask){
                 digitalWrite(PHASE_PIN, LOW);
