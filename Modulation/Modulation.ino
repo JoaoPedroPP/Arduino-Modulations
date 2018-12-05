@@ -1,23 +1,18 @@
 #include "ask.hpp"
 #include "fsk.hpp"
-#include "psk.hpp"
+// #include "psk.hpp"
 
 FSKModulation fsk;
 ASKModulation ask;
-PSKModulation psk;
-
-int led = 13;
-int ledPin = 9;
+// PSKModulation psk;
 
 void setup() {
 //   ask.begin();
 //  fsk.begin();
-    psk.begin();
 }
 
 void loop() {
-  psk.transmite('U');
-//   ask.transmite('U');
-//    fsk.transmite('U');
+  ask.transmite(0xc1);
+//    fsk.transmite(0xaa);
 //  fsk.transmite("joao pedro poloni ponce escreveu esse software", 46);
 }
