@@ -80,11 +80,6 @@ void FSKModulation::modulate(uint8_t data){
 }
 
 size_t FSKModulation::transmite(const uint8_t *buffer, size_t length){
-    uint8_t cnt = ((micros()- _TempoUltimaTransmissao)/BIT_PERIOD);
-    if (cnt > MAX_CARRIR_BITS){
-        cnt = MAX_CARRIR_BITS;
-    }
-
     size_t n = length;
     while(length--){ // Aqui e onde a magia acontece
     uint8_t data = *buffer++;
